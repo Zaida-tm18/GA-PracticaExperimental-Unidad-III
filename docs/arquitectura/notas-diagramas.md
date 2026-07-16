@@ -20,9 +20,12 @@ Muestra los contenedores de software que componen el sistema, dentro del límite
 - **Relaciones:** el frontend consume la API vía HTTPS/JSON; la API lee/escribe en PostgreSQL vía JDBC y en Redis vía protocolo Redis (cache-aside + blacklist de JTI).
 
 ## C4 Nivel 3 — Componentes
-**Archivo:** `C4-Nivel3-Componentes.png` *(pendiente)*
+**Archivo:** `C4-Nivel3-Componentes.png`
 
-Descompone el contenedor de mayor complejidad (API Application) en sus componentes internos: Controllers, Services, Repositories, Middleware de autenticación JWT, y capa ORM/Entity.
+Descompone el contenedor de mayor complejidad (API Application) en sus componentes internos.
+
+- **Componentes:** AuthController, ResourceController, JwtAuthenticationFilter, AuthService, ResourceService, ResourceRepository.
+- **Relaciones clave:** el filtro JWT verifica la blacklist de JTI en Redis antes de permitir el paso a los controllers; ResourceService aplica `@Cacheable`/`@CacheEvict` sobre Redis antes de llegar al Repository/PostgreSQL.
 
 ## Diagrama de clases UML
 **Archivo:** `Diagrama-UML-Clases.png` *(pendiente)*
@@ -35,4 +38,4 @@ Diagrama de clases refactorizado con todos los paquetes del sistema implementado
 Generado desde pgAdmin 4 ERD Tool, muestra las tablas de la base de datos PostgreSQL y sus relaciones.
 
 ---
-*Última actualización: 13 de julio de 2026 — C4 Nivel 1 y Nivel 2 completados.*
+*Última actualización: 13 de julio de 2026 — C4 Nivel 1, 2 y 3 completados.*
