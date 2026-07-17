@@ -16,6 +16,8 @@ Los criterios de evaluación considerados fueron:
 
 Angular es un framework completo ("batteries-included") que impone una estructura de proyecto definida (módulos, componentes, servicios, inyección de dependencias), mientras que React es una biblioteca de UI que requiere decisiones adicionales del equipo sobre enrutamiento, manejo de estado y estructura de carpetas, normalmente resueltas con librerías de terceros (React Router, Redux o Context API).
 
+Estudios de rendimiento comparativo entre frameworks modernos de frontend (Angular, React, Vue, Svelte y Blazor) muestran diferencias significativas en las estrategias de renderizado, con implicaciones prácticas de rendimiento que pueden variar hasta en varios órdenes de magnitud según la complejidad de la aplicación (Ollila et al., 2022). Estas diferencias derivan principalmente de cómo cada framework gestiona las transiciones de estado en la interfaz de usuario, un factor relevante para justificar la elección de una arquitectura de frontend predecible y estructurada como Angular.
+
 ## Decisión
 Se selecciona **Angular 17+** como framework de frontend para el PFC.
 
@@ -42,3 +44,6 @@ Los factores decisivos fueron:
 
 1. **React**: descartado por requerir decisiones adicionales de arquitectura (enrutamiento, manejo de estado, estructura de carpetas) que debían resolverse con librerías externas, lo cual introduce mayor riesgo de inconsistencia entre los tres integrantes del equipo dado el plazo académico limitado. Su mayor flexibilidad es una ventaja en proyectos con necesidades muy específicas de personalización, pero no era prioritaria para el PFC.
 2. **Vue.js**: no se evaluó en profundidad por no ser parte del stack tecnológico definido inicialmente para el PFC (Angular 17+ especificado en los requisitos del proyecto).
+
+## Referencias
+Ollila, R., Mäkitalo, N., & Mikkonen, T. (2022). Modern web frameworks: A comparison of rendering performance. *Journal of Web Engineering, 21*(3), 1–35. https://doi.org/10.13052/jwe1540-9589.21311
