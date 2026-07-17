@@ -14,11 +14,11 @@ pfc-backend,com.uteq.pfc.dto,EntidadResponse,2,62,2,2,0,11,2,2,0,2
 pfc-backend,com.uteq.pfc.dto,AuthDtos.LogoutResponse,9,0,0,0,1,0,1,0,1,0
 pfc-backend,com.uteq.pfc.dto,AuthDtos,3,0,0,0,1,0,1,0,1,0
 pfc-backend,com.uteq.pfc.dto,EntidadRequest,0,21,0,0,0,1,0,1,0,1
-pfc-backend,com.uteq.pfc.config,RedisCacheConfig,76,0,0,0,24,0,4,0,4,0
+pfc-backend,com.uteq.pfc.config,RedisCacheConfig,89,0,0,0,29,0,4,0,4,0
 pfc-backend,com.uteq.pfc.config,SecurityConfig,95,0,0,0,19,0,6,0,6,0
 pfc-backend,com.uteq.pfc.entity,Entidad,4,7,0,0,2,3,1,1,1,1
 pfc-backend,com.uteq.pfc.entity,Usuario,4,7,0,0,2,3,1,1,1,1
 pfc-backend,com.uteq.pfc.service,AuthService.LoginResultado,12,0,0,0,1,0,1,0,1,0
 pfc-backend,com.uteq.pfc.service,EntidadService,95,77,0,2,22,17,4,6,4,5
 pfc-backend,com.uteq.pfc.service,AuthService,63,0,2,0,10,0,4,0,3,0
-pfc-backend,com.uteq.pfc.repository,EntidadSpecifications,15,69,6,6,5,10,6,10,0,10
+pfc-backend,com.uteq.pfc.repository,EntidadSpecifications,0,84,0,12,0,20,0,16,0,10

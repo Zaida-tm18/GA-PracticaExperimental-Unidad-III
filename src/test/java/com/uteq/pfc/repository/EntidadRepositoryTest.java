@@ -187,4 +187,60 @@ class EntidadRepositoryTest {
         assertThat(recuperada.getNombre()).isEqualTo("Modificado");
         assertThat(recuperada.getStock()).isEqualTo(99);
     }
+
+    // ---------------------------------------------------------------
+    // Ramas "sin filtro" (valor null) de EntidadSpecifications.
+    // Cada Specification devuelve cb.conjunction() cuando el
+    // parametro es null/blank; estos casos no estaban cubiertos y
+    // dejaban la cobertura de LINE del paquete repository por debajo
+    // del 70% exigido, aunque la de INSTRUCTION ya lo superaba.
+    // ---------------------------------------------------------------
+
+    @Test
+    void nombreContiene_conNullOBlank_noDebeFiltrar() {
+        Specification<Entidad> specNull = EntidadSpecifications.nombreContiene(null);
+        Specification<Entidad> specBlank = EntidadSpecifications.nombreContiene("   ");
+
+        var pageNull = entidadRepository.findAll(specNull, PageRequest.of(0, 10));
+        var pageBlank = entidadRepository.findAll(specBlank, PageRequest.of(0, 10));
+
+        assertThat(pageNull.getTotalElements()).isEqualTo(4);
+        assertThat(pageBlank.getTotalElements()).isEqualTo(4);
+    }
+
+    @Test
+    void categoriaId_conNull_noDebeFiltrar() {
+        Specification<Entidad> spec = EntidadSpecifications.categoriaId(null);
+
+        var page = entidadRepository.findAll(spec, PageRequest.of(0, 10));
+
+        assertThat(page.getTotalElements()).isEqualTo(4);
+    }
+
+    @Test
+    void precioMinimo_conNull_noDebeFiltrar() {
+        Specification<Entidad> spec = EntidadSpecifications.precioMinimo(null);
+
+        var page = entidadRepository.findAll(spec, PageRequest.of(0, 10));
+
+        assertThat(page.getTotalElements()).isEqualTo(4);
+    }
+
+    @Test
+    void precioMaximo_conNull_noDebeFiltrar() {
+        Specification<Entidad> spec = EntidadSpecifications.precioMaximo(null);
+
+        var page = entidadRepository.findAll(spec, PageRequest.of(0, 10));
+
+        assertThat(page.getTotalElements()).isEqualTo(4);
+    }
+
+    @Test
+    void stockMinimo_conNull_noDebeFiltrar() {
+        Specification<Entidad> spec = EntidadSpecifications.stockMinimo(null);
+
+        var page = entidadRepository.findAll(spec, PageRequest.of(0, 10));
+
+        assertThat(page.getTotalElements()).isEqualTo(4);
+    }
 }

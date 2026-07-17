@@ -7,41 +7,34 @@ Este anexo documenta la organización de carpetas y archivos del repositorio del
 
 ```
 GA-PracticaExperimental-Unidad-III/
-├── docs/
-│   ├── adr/
-│   │   ├── ADR-001-arquitectura-capas.md
-│   │   ├── ADR-002-angular-vs-react.md
-│   │   └── ADR-003-redis-cache-jwt.md
-│   ├── arquitectura/
-│   │   ├── notas-diagramas.md
-│   │   ├── C4-Nivel1-Contexto.png
-│   │   ├── C4-Nivel2-Contenedores.png
-│   │   └── C4-Nivel3-Componentes.png
-│   └── Anexo-A-estructura-repositorio.md
-└── pfc-backend/
-    ├── pom.xml
-    ├── docker-compose.yml              # PostgreSQL + Redis + Redis Commander
-    ├── src/main/java/com/uteq/pfc/
-    │   ├── entity/                     # Usuario, Categoria, Entidad (JPA)
-    │   ├── repository/                 # JpaRepository + Specifications (filtros)
-    │   ├── service/                    # EntidadService (cache-aside), AuthService
-    │   ├── controller/                 # EntidadController, AuthController
-    │   ├── security/                   # JwtProvider, JwtAuthFilter, TokenBlacklistService
-    │   ├── config/                     # SecurityConfig, RedisCacheConfig
-    │   ├── dto/                        # Requests/Responses, PageResponse
-    │   └── exception/                  # Manejo global de errores
-    ├── src/main/resources/
-    │   ├── application.yml
-    │   └── db/migration/               # V1, V2, V3 (Flyway)
-    ├── src/test/java/com/uteq/pfc/
-    │   ├── repository/                 # ≥70% cobertura exigida
-    │   └── service/
-    └── docs/
-        ├── benchmark/                  # benchmark.sh, analizar_benchmark.py, resultados
-        └── evidencias/                 # checklist de capturas pendientes
+├── pom.xml
+├── docker-compose.yml            # PostgreSQL + Redis + Redis Commander
+├── panel/                        # Frontend de pruebas (PE-U1)
+│   ├── index.html
+│   └── servidor.ps1
+├── src/main/java/com/uteq/pfc/
+│   ├── entity/                   # Usuario, Categoria, Entidad (JPA)
+│   ├── repository/                # JpaRepository + Specifications (filtros dinámicos)
+│   ├── service/                   # EntidadService (cache-aside), AuthService
+│   ├── controller/                # EntidadController, AuthController
+│   ├── security/                  # JwtProvider, JwtAuthFilter, TokenBlacklistService
+│   ├── config/                    # SecurityConfig, RedisCacheConfig
+│   ├── dto/                       # Requests/Responses, PageResponse
+│   └── exception/                 # GlobalExceptionHandler
+├── src/main/resources/
+│   ├── application.yml
+│   └── db/migration/              # V1 (esquema), V2 (auditoría/tokens), V3 (seeders, 55 registros)
+├── src/test/java/com/uteq/pfc/
+│   ├── repository/                # EntidadRepositoryTest, CategoriaRepositoryTest (≥70% cobertura)
+│   └── service/                   # EntidadServiceTest
+└── docs/
+    ├── adr/                        # ADR-001, ADR-002, ADR-003
+    ├── arquitectura/                # Diagramas C4 (Niveles 1-3), ER y UML de clases
+    ├── benchmark/                   # Scripts y resultados del benchmark de caché
+    ├── evidencias/                  # Capturas de pantalla exigidas por la guía
+    ├── referencias/                 # Papers usados como referencia IEEE
+    └── Anexo-A-estructura-repositorio.md
 ```
-
-*(Estructura de `pfc-backend/` según el README del equipo; corresponde a los Pasos 2, 3 y 4, a cargo de otro integrante. La carpeta `docs/` en la raíz corresponde al Paso 1, diseño arquitectónico.)*
 
 ## Convención de ramas
 El equipo trabaja con una rama por integrante/responsabilidad, sin hacer commits directos a `main`:

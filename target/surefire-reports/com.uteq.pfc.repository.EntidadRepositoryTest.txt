@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.uteq.pfc.repository.EntidadRepositoryTest
 -------------------------------------------------------------------------------
-Tests run: 12, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.794 s -- in com.uteq.pfc.repository.EntidadRepositoryTest
+Tests run: 17, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.639 s -- in com.uteq.pfc.repository.EntidadRepositoryTest

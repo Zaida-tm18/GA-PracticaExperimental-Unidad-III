@@ -98,10 +98,7 @@ escenario de mayor concurrencia.
 
 ## [Evaluación] Pregunta 4
 
-**La cobertura de pruebas del Repository alcanzó ___%. ¿Qué casos de prueba
-adicionales aumentarían la confianza en el código sin aumentar
-significativamente el mantenimiento de los tests? ¿Qué tipo de bugs no
-captura la prueba unitaria del Repository?**
+**La cobertura alcanzó 100% en la capa Repository. Aun así, hay tipos de bugs que las pruebas unitarias con base de datos en memoria no capturan: diferencias de comportamiento entre H2 y PostgreSQL en producción (funciones SQL específicas, tipos de datos, collation en comparaciones LIKE), problemas de concurrencia bajo carga real, y el rendimiento real de las queries con volúmenes grandes de datos. Pruebas de integración contra PostgreSQL real (Testcontainers) y pruebas de carga complementarían esta cobertura unitaria.**
 
 > Completar el porcentaje real ejecutando `mvn test` y revisando
 > `target/site/jacoco/index.html` (ver `docs/evidencias/README.md`).
