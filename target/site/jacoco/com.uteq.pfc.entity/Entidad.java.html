@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Entidad.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pfc-backend</a> &gt; <a href="index.source.html" class="el_package">com.uteq.pfc.entity</a> &gt; <span class="el_source">Entidad.java</span></div><h1>Entidad.java</h1><pre class="source lang-java linenums">package com.uteq.pfc.entity;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+/**
+ * Entidad principal del PFC (renombrar segun el dominio real del proyecto,
+ * ej. Producto, Reserva, Publicacion, etc.). Se usa &quot;Entidad&quot; como
+ * placeholder generico consistente con el endpoint /api/entidades
+ * mencionado en el Paso 5.1 de la guia.
+ *
+ * Implementa Serializable porque los objetos de esta clase se serializan
+ * como JSON al guardarse en cache Redis (patron cache-aside, Paso 3).
+ */
+@Entity
+@Table(name = &quot;entidades&quot;)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Entidad implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, length = 150)
+    private String nombre;
+
+    @Column(columnDefinition = &quot;TEXT&quot;)
+    private String descripcion;
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal precio;
+
+    @Column(nullable = false)
+    private Integer stock;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = &quot;categoria_id&quot;, nullable = false)
+    private Categoria categoria;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = &quot;usuario_id&quot;)
+    private Usuario usuario;
+
+    @Column(name = &quot;creado_en&quot;, updatable = false)
+    private LocalDateTime creadoEn;
+
+    @Column(name = &quot;actualizado_en&quot;)
+    private LocalDateTime actualizadoEn;
+
+    @PrePersist
+    void prePersist() {
+<span class="fc" id="L60">        creadoEn = LocalDateTime.now();</span>
+<span class="fc" id="L61">        actualizadoEn = LocalDateTime.now();</span>
+<span class="fc" id="L62">    }</span>
+
+    @PreUpdate
+    void preUpdate() {
+<span class="nc" id="L66">        actualizadoEn = LocalDateTime.now();</span>
+<span class="nc" id="L67">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
