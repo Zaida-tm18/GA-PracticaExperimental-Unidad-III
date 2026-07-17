@@ -47,3 +47,8 @@ Esta estructura se despliega como una única aplicación backend (con posibilida
 
 ## Referencias
 Akinsola, J. E. T., Akinkunmi, A. O., Olaniyi, I. M., Efiong, J. E., & Olajubu, E. A. (2026). Multi-criteria decision-making (MCDM) approach for software architecture selection in cloud computing using evidential reasoning and Bayesian inference techniques. *International Journal of Information Engineering and Electronic Business, 18*(1), 1–12. https://doi.org/10.5815/ijieeb.2026.01.01
+
+### Nota sobre el motor de base de datos: PostgreSQL en lugar de MySQL
+
+Aunque la guía sugiere MySQL 8.0, el equipo optó por **PostgreSQL 16** como motor relacional del PFC. Ambos son compatibles con Hibernate/JPA mediante el dialecto correspondiente, por lo que el cambio no afecta los objetivos de la práctica (ORM, migraciones, caché, pruebas unitarias). La decisión se basó en el sistema de tipos más estricto de PostgreSQL (`NUMERIC` con
+precisión garantizada, `JSONB` indexable), su mayor adherencia al estándar SQL, y la experiencia previa del equipo con este motor, lo que redujo el riesgo de errores de configuración dado el plazo académico limitado. El cambio solo implicó ajustar el dialecto de Hibernate (`PostgreSQLDialect`) y las imágenes en `docker-compose.yml`, sin afectar el modelo de datos ni la lógica de negocio.
