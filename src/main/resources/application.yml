@@ -1,0 +1,59 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: pfc-backend
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pfc_db
+    username: pfc_user
+    password: pfc_password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate   # el esquema lo gestiona Flyway, no Hibernate (ver ADR-002 del equipo)
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          batch_size: 20
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: 300000   # 300s = 5 min, TTL por defecto del cache-aside
+
+# Configuracion JWT (Paso 3 - 2a del GA)
+app:
+  jwt:
+    secret: "tKp9Xm2QwZr7VbN4jLc8HsF1yDqA6eYgU3iOxM5Nk0T="
+    expiration-ms: 3600000        # 1 hora
+    cookie-name: "access_token"
+  cors:
+    allowed-origins: "http://localhost:5500,http://localhost:4200"
+
+logging:
+  level:
+    com.uteq.pfc: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.springframework.cache: TRACE
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics
