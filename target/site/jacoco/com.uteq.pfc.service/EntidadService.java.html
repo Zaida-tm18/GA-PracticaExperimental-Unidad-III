@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EntidadService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pfc-backend</a> &gt; <a href="index.source.html" class="el_package">com.uteq.pfc.service</a> &gt; <span class="el_source">EntidadService.java</span></div><h1>EntidadService.java</h1><pre class="source lang-java linenums">package com.uteq.pfc.service;
+
+import com.uteq.pfc.dto.EntidadRequest;
+import com.uteq.pfc.dto.EntidadResponse;
+import com.uteq.pfc.dto.PageResponse;
+import com.uteq.pfc.entity.Categoria;
+import com.uteq.pfc.entity.Entidad;
+import com.uteq.pfc.exception.RecursoNoEncontradoException;
+import com.uteq.pfc.repository.CategoriaRepository;
+import com.uteq.pfc.repository.EntidadRepository;
+import com.uteq.pfc.repository.EntidadSpecifications;
+import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+
+/**
+ * Capa Service (arquitectura en capas: Controller -&gt; Service -&gt; Repository -&gt; Entity,
+ * GA punto 2c).
+ *
+ * Implementa el patron CACHE-ASIDE (Paso 3.1):
+ *   - Lectura (listar): @Cacheable -&gt; primero busca en Redis; si hay miss,
+ *     consulta la BD via Repository y guarda el resultado en cache.
+ *   - Escritura (crear/actualizar/eliminar): @CacheEvict -&gt; invalida las
+ *     entradas de cache afectadas para evitar servir datos obsoletos.
+ *
+ * Estrategia de invalidacion: se usa allEntries=true sobre el cache &quot;entidades&quot;
+ * en cada escritura. Es una estrategia simple y segura (evita servir datos
+ * obsoletos) a costa de invalidar mas de lo estrictamente necesario; para un
+ * PFC universitario el volumen de escrituras no justifica una invalidacion
+ * selectiva por clave compuesta.
+ */
+@Service
+@RequiredArgsConstructor
+public class EntidadService {
+
+    private final EntidadRepository entidadRepository;
+    private final CategoriaRepository categoriaRepository;
+
+    private static final String CACHE_NAME = &quot;entidades&quot;;
+
+    /**
+     * Paso 2.3: CRUD con paginacion, ordenamiento dinamico (via Pageable.sort)
+     * y busqueda con filtros multiples (via Specification).
+     *
+     * Esta es tambien LA CONSULTA PRINCIPAL usada en el benchmark del Paso 3.2
+     * (con y sin cache) porque es el listado mas costoso del sistema.
+     */
+    @Cacheable(
+            value = CACHE_NAME,
+            key = &quot;'listado:' + #pageable.pageNumber + ':' + #pageable.pageSize + ':' + &quot; +
+                  &quot;#pageable.sort.toString() + ':' + #nombre + ':' + #categoriaId + ':' + &quot; +
+                  &quot;#precioMin + ':' + #precioMax + ':' + #stockMin&quot;
+    )
+    @Transactional(readOnly = true)
+    public PageResponse&lt;EntidadResponse&gt; listar(Pageable pageable,
+                                                 String nombre,
+                                                 Long categoriaId,
+                                                 BigDecimal precioMin,
+                                                 BigDecimal precioMax,
+                                                 Integer stockMin) {
+<span class="nc" id="L68">        Specification&lt;Entidad&gt; spec = Specification</span>
+<span class="nc" id="L69">                .where(EntidadSpecifications.nombreContiene(nombre))</span>
+<span class="nc" id="L70">                .and(EntidadSpecifications.categoriaId(categoriaId))</span>
+<span class="nc" id="L71">                .and(EntidadSpecifications.precioMinimo(precioMin))</span>
+<span class="nc" id="L72">                .and(EntidadSpecifications.precioMaximo(precioMax))</span>
+<span class="nc" id="L73">                .and(EntidadSpecifications.stockMinimo(stockMin));</span>
+
+<span class="nc" id="L75">        Page&lt;Entidad&gt; page = entidadRepository.findAll(spec, pageable);</span>
+<span class="nc" id="L76">        Page&lt;EntidadResponse&gt; mapped = page.map(EntidadResponse::from);</span>
+<span class="nc" id="L77">        return PageResponse.from(mapped);</span>
+    }
+
+    @Transactional(readOnly = true)
+    public EntidadResponse obtenerPorId(Long id) {
+<span class="fc" id="L82">        Entidad entidad = entidadRepository.findById(id)</span>
+<span class="pc" id="L83">                .orElseThrow(() -&gt; new RecursoNoEncontradoException(&quot;Entidad con id &quot; + id + &quot; no encontrada&quot;));</span>
+<span class="nc" id="L84">        return EntidadResponse.from(entidad);</span>
+    }
+
+    @CacheEvict(value = CACHE_NAME, allEntries = true)
+    @Transactional
+    public EntidadResponse crear(EntidadRequest request) {
+<span class="fc" id="L90">        Categoria categoria = categoriaRepository.findById(request.categoriaId())</span>
+<span class="fc" id="L91">                .orElseThrow(() -&gt; new RecursoNoEncontradoException(</span>
+<span class="fc" id="L92">                        &quot;Categoria con id &quot; + request.categoriaId() + &quot; no encontrada&quot;));</span>
+
+<span class="fc" id="L94">        Entidad entidad = new Entidad();</span>
+<span class="fc" id="L95">        entidad.setNombre(request.nombre());</span>
+<span class="fc" id="L96">        entidad.setDescripcion(request.descripcion());</span>
+<span class="fc" id="L97">        entidad.setPrecio(request.precio());</span>
+<span class="fc" id="L98">        entidad.setStock(request.stock());</span>
+<span class="fc" id="L99">        entidad.setCategoria(categoria);</span>
+
+<span class="fc" id="L101">        Entidad guardada = entidadRepository.save(entidad);</span>
+<span class="fc" id="L102">        return EntidadResponse.from(guardada);</span>
+    }
+
+    @CacheEvict(value = CACHE_NAME, allEntries = true)
+    @Transactional
+    public EntidadResponse actualizar(Long id, EntidadRequest request) {
+<span class="nc" id="L108">        Entidad entidad = entidadRepository.findById(id)</span>
+<span class="nc" id="L109">                .orElseThrow(() -&gt; new RecursoNoEncontradoException(&quot;Entidad con id &quot; + id + &quot; no encontrada&quot;));</span>
+
+<span class="nc" id="L111">        Categoria categoria = categoriaRepository.findById(request.categoriaId())</span>
+<span class="nc" id="L112">                .orElseThrow(() -&gt; new RecursoNoEncontradoException(</span>
+<span class="nc" id="L113">                        &quot;Categoria con id &quot; + request.categoriaId() + &quot; no encontrada&quot;));</span>
+
+<span class="nc" id="L115">        entidad.setNombre(request.nombre());</span>
+<span class="nc" id="L116">        entidad.setDescripcion(request.descripcion());</span>
+<span class="nc" id="L117">        entidad.setPrecio(request.precio());</span>
+<span class="nc" id="L118">        entidad.setStock(request.stock());</span>
+<span class="nc" id="L119">        entidad.setCategoria(categoria);</span>
+
+<span class="nc" id="L121">        Entidad actualizada = entidadRepository.save(entidad);</span>
+<span class="nc" id="L122">        return EntidadResponse.from(actualizada);</span>
+    }
+
+    @CacheEvict(value = CACHE_NAME, allEntries = true)
+    @Transactional
+    public void eliminar(Long id) {
+<span class="fc bfc" id="L128" title="All 2 branches covered.">        if (!entidadRepository.existsById(id)) {</span>
+<span class="fc" id="L129">            throw new RecursoNoEncontradoException(&quot;Entidad con id &quot; + id + &quot; no encontrada&quot;);</span>
+        }
+<span class="fc" id="L131">        entidadRepository.deleteById(id);</span>
+<span class="fc" id="L132">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

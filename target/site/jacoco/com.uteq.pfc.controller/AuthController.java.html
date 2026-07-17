@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pfc-backend</a> &gt; <a href="index.source.html" class="el_package">com.uteq.pfc.controller</a> &gt; <span class="el_source">AuthController.java</span></div><h1>AuthController.java</h1><pre class="source lang-java linenums">package com.uteq.pfc.controller;
+
+import com.uteq.pfc.dto.AuthDtos;
+import com.uteq.pfc.service.AuthService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping(&quot;/api/auth&quot;)
+@RequiredArgsConstructor
+public class AuthController {
+
+    private final AuthService authService;
+
+    @Value(&quot;${app.jwt.cookie-name}&quot;)
+    private String cookieName;
+
+    @Value(&quot;${app.jwt.expiration-ms}&quot;)
+    private long expirationMs;
+
+    @PostMapping(&quot;/login&quot;)
+    public AuthDtos.LoginResponse login(@Valid @RequestBody AuthDtos.LoginRequest request,
+                                         HttpServletResponse response) {
+<span class="nc" id="L28">        AuthService.LoginResultado resultado = authService.login(request.email(), request.password());</span>
+
+        // Cookie HttpOnly: inaccesible desde JavaScript -&gt; mitiga robo de
+        // token via XSS (ver fundamento teorico 5.1). No se usa localStorage.
+<span class="nc" id="L32">        Cookie cookie = new Cookie(cookieName, resultado.token());</span>
+<span class="nc" id="L33">        cookie.setHttpOnly(true);</span>
+<span class="nc" id="L34">        cookie.setSecure(false);          // solo HTTPS en produccion</span>
+<span class="nc" id="L35">        cookie.setPath(&quot;/&quot;);</span>
+<span class="nc" id="L36">        cookie.setMaxAge((int) (expirationMs / 1000));</span>
+<span class="nc" id="L37">        response.addCookie(cookie);</span>
+
+<span class="nc" id="L39">        return new AuthDtos.LoginResponse(&quot;Login exitoso&quot;, resultado.nombre(), resultado.rol());</span>
+    }
+
+    @PostMapping(&quot;/logout&quot;)
+    public AuthDtos.LogoutResponse logout(@CookieValue(name = &quot;${app.jwt.cookie-name}&quot;, required = false) String token,
+                                           HttpServletResponse response) {
+<span class="nc bnc" id="L45" title="All 2 branches missed.">        if (token != null) {</span>
+<span class="nc" id="L46">            authService.logout(token);</span>
+        }
+
+        // Expira la cookie del lado del cliente tambien
+<span class="nc" id="L50">        Cookie cookie = new Cookie(cookieName, &quot;&quot;);</span>
+<span class="nc" id="L51">        cookie.setHttpOnly(true);</span>
+<span class="nc" id="L52">        cookie.setPath(&quot;/&quot;);</span>
+<span class="nc" id="L53">        cookie.setMaxAge(0);</span>
+<span class="nc" id="L54">        response.addCookie(cookie);</span>
+
+<span class="nc" id="L56">        return new AuthDtos.LogoutResponse(&quot;Sesion cerrada correctamente.&quot;, null);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

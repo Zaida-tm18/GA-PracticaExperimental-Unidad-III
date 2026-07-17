@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EntidadSpecifications.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pfc-backend</a> &gt; <a href="index.source.html" class="el_package">com.uteq.pfc.repository</a> &gt; <span class="el_source">EntidadSpecifications.java</span></div><h1>EntidadSpecifications.java</h1><pre class="source lang-java linenums">package com.uteq.pfc.repository;
+
+import com.uteq.pfc.entity.Entidad;
+import org.springframework.data.jpa.domain.Specification;
+
+import java.math.BigDecimal;
+
+/**
+ * Paso 2.3 - CRUD con busqueda con filtros multiples.
+ * Cada metodo devuelve una Specification combinable con .and() / .or(),
+ * evitando condicionales gigantes en el Service.
+ */
+public class EntidadSpecifications {
+
+    private EntidadSpecifications() {}
+
+    public static Specification&lt;Entidad&gt; nombreContiene(String texto) {
+<span class="pc bpc" id="L18" title="2 of 4 branches missed.">        return (root, query, cb) -&gt; texto == null || texto.isBlank()</span>
+<span class="nc" id="L19">                ? cb.conjunction()</span>
+<span class="fc" id="L20">                : cb.like(cb.lower(root.get(&quot;nombre&quot;)), &quot;%&quot; + texto.toLowerCase() + &quot;%&quot;);</span>
+    }
+
+    public static Specification&lt;Entidad&gt; categoriaId(Long categoriaId) {
+<span class="pc bpc" id="L24" title="1 of 2 branches missed.">        return (root, query, cb) -&gt; categoriaId == null</span>
+<span class="nc" id="L25">                ? cb.conjunction()</span>
+<span class="fc" id="L26">                : cb.equal(root.get(&quot;categoria&quot;).get(&quot;id&quot;), categoriaId);</span>
+    }
+
+    public static Specification&lt;Entidad&gt; precioMinimo(BigDecimal min) {
+<span class="pc bpc" id="L30" title="1 of 2 branches missed.">        return (root, query, cb) -&gt; min == null</span>
+<span class="nc" id="L31">                ? cb.conjunction()</span>
+<span class="fc" id="L32">                : cb.greaterThanOrEqualTo(root.get(&quot;precio&quot;), min);</span>
+    }
+
+    public static Specification&lt;Entidad&gt; precioMaximo(BigDecimal max) {
+<span class="pc bpc" id="L36" title="1 of 2 branches missed.">        return (root, query, cb) -&gt; max == null</span>
+<span class="nc" id="L37">                ? cb.conjunction()</span>
+<span class="fc" id="L38">                : cb.lessThanOrEqualTo(root.get(&quot;precio&quot;), max);</span>
+    }
+
+    public static Specification&lt;Entidad&gt; stockMinimo(Integer min) {
+<span class="pc bpc" id="L42" title="1 of 2 branches missed.">        return (root, query, cb) -&gt; min == null</span>
+<span class="nc" id="L43">                ? cb.conjunction()</span>
+<span class="fc" id="L44">                : cb.greaterThanOrEqualTo(root.get(&quot;stock&quot;), min);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

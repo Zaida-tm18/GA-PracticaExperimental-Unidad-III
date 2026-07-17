@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TokenBlacklistService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pfc-backend</a> &gt; <a href="index.source.html" class="el_package">com.uteq.pfc.security</a> &gt; <span class="el_source">TokenBlacklistService.java</span></div><h1>TokenBlacklistService.java</h1><pre class="source lang-java linenums">package com.uteq.pfc.security;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
+
+import java.time.Duration;
+
+/**
+ * GA punto 2a: gestion de estado stateless con JWT + blacklist de JTI en Redis.
+ *
+ * El JWT en si es stateless (no se guarda sesion en el servidor), pero el
+ * &quot;logout&quot; en un esquema puramente stateless no puede invalidar un token ya
+ * emitido -&gt; se resuelve con una blacklist de corta duracion en Redis:
+ * al hacer logout, se guarda el JTI (JWT ID) del token con un TTL igual al
+ * tiempo de vida restante del token. En cada peticion protegida se verifica
+ * que el JTI NO este en la blacklist.
+ *
+ * Ver ADR-003 (Panama) para la justificacion de usar Redis en este rol.
+ */
+@Service
+@RequiredArgsConstructor
+public class TokenBlacklistService {
+
+    private static final String PREFIJO = &quot;jwt:blacklist:&quot;;
+
+    private final StringRedisTemplate redisTemplate;
+
+    /**
+     * Marca un JTI como invalidado. El TTL debe ser el tiempo restante de
+     * vida del token para no ocupar Redis indefinidamente: pasado ese TTL
+     * el propio JWT ya habria expirado por su campo &quot;exp&quot;, asi que ya no
+     * hace falta seguir bloqueandolo explicitamente.
+     */
+    public void invalidar(String jti, Duration tiempoRestante) {
+<span class="nc bnc" id="L36" title="All 4 branches missed.">        if (tiempoRestante.isNegative() || tiempoRestante.isZero()) {</span>
+<span class="nc" id="L37">            return; // el token ya expiro por si mismo, no hace falta blacklist</span>
+        }
+<span class="nc" id="L39">        redisTemplate.opsForValue().set(PREFIJO + jti, &quot;invalidado&quot;, tiempoRestante);</span>
+<span class="nc" id="L40">    }</span>
+
+    public boolean estaInvalidado(String jti) {
+<span class="nc" id="L43">        return Boolean.TRUE.equals(redisTemplate.hasKey(PREFIJO + jti));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

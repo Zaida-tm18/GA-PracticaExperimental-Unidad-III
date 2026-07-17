@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JwtAuthFilter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pfc-backend</a> &gt; <a href="index.source.html" class="el_package">com.uteq.pfc.security</a> &gt; <span class="el_source">JwtAuthFilter.java</span></div><h1>JwtAuthFilter.java</h1><pre class="source lang-java linenums">package com.uteq.pfc.security;
+
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+import java.util.List;
+
+/**
+ * Lee el JWT desde la cookie HttpOnly (nunca desde localStorage/header,
+ * ver justificacion en fundamento teorico 5.1 de Cajas sobre riesgos XSS),
+ * valida la firma y verifica que el JTI no este en la blacklist de Redis
+ * antes de autenticar la peticion.
+ */
+@Component
+@RequiredArgsConstructor
+public class JwtAuthFilter extends OncePerRequestFilter {
+
+    private final JwtProvider jwtProvider;
+    private final TokenBlacklistService blacklistService;
+
+    @Value(&quot;${app.jwt.cookie-name}&quot;)
+    private String cookieName;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                     HttpServletResponse response,
+                                     FilterChain filterChain) throws ServletException, IOException {
+
+<span class="nc" id="L41">        String token = extraerTokenDeCookie(request);</span>
+
+<span class="nc bnc" id="L43" title="All 4 branches missed.">        if (token != null &amp;&amp; jwtProvider.esValido(token)) {</span>
+<span class="nc" id="L44">            Claims claims = jwtProvider.parsearClaims(token);</span>
+<span class="nc" id="L45">            String jti = claims.getId();</span>
+
+<span class="nc bnc" id="L47" title="All 2 branches missed.">            if (!blacklistService.estaInvalidado(jti)) {</span>
+<span class="nc" id="L48">                String email = claims.getSubject();</span>
+<span class="nc" id="L49">                String rol = claims.get(&quot;rol&quot;, String.class);</span>
+
+<span class="nc" id="L51">                var authToken = new UsernamePasswordAuthenticationToken(</span>
+<span class="nc" id="L52">                        email, null, List.of(new SimpleGrantedAuthority(&quot;ROLE_&quot; + rol)));</span>
+<span class="nc" id="L53">                SecurityContextHolder.getContext().setAuthentication(authToken);</span>
+            }
+            // si esta en blacklist, simplemente no se autentica -&gt; 401 en endpoints protegidos
+        }
+
+<span class="nc" id="L58">        filterChain.doFilter(request, response);</span>
+<span class="nc" id="L59">    }</span>
+
+    private String extraerTokenDeCookie(HttpServletRequest request) {
+<span class="nc bnc" id="L62" title="All 2 branches missed.">        if (request.getCookies() == null) return null;</span>
+<span class="nc bnc" id="L63" title="All 2 branches missed.">        for (Cookie cookie : request.getCookies()) {</span>
+<span class="nc bnc" id="L64" title="All 2 branches missed.">            if (cookieName.equals(cookie.getName())) {</span>
+<span class="nc" id="L65">                return cookie.getValue();</span>
+            }
+        }
+<span class="nc" id="L68">        return null;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

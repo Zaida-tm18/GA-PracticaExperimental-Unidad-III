@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EntidadController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pfc-backend</a> &gt; <a href="index.source.html" class="el_package">com.uteq.pfc.controller</a> &gt; <span class="el_source">EntidadController.java</span></div><h1>EntidadController.java</h1><pre class="source lang-java linenums">package com.uteq.pfc.controller;
+
+import com.uteq.pfc.dto.EntidadRequest;
+import com.uteq.pfc.dto.EntidadResponse;
+import com.uteq.pfc.dto.PageResponse;
+import com.uteq.pfc.service.EntidadService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
+
+/**
+ * Capa Controller (arquitectura en capas). Corresponde al endpoint
+ * /api/entidades mencionado en el Paso 5.1 de la guia (integracion
+ * frontend-backend-datos).
+ */
+@RestController
+@RequestMapping(&quot;/api/entidades&quot;)
+@RequiredArgsConstructor
+public class EntidadController {
+
+    private final EntidadService entidadService;
+
+    /**
+     * Paso 2.3: paginacion via Pageable (?page=0&amp;size=20&amp;sort=precio,desc)
+     * y filtros multiples opcionales por query params.
+     * Es tambien la &quot;consulta principal&quot; usada en el benchmark del Paso 3.2.
+     */
+    @GetMapping
+    public PageResponse&lt;EntidadResponse&gt; listar(
+            Pageable pageable,
+            @RequestParam(required = false) String nombre,
+            @RequestParam(required = false) Long categoriaId,
+            @RequestParam(required = false) BigDecimal precioMin,
+            @RequestParam(required = false) BigDecimal precioMax,
+            @RequestParam(required = false) Integer stockMin) {
+<span class="nc" id="L41">        return entidadService.listar(pageable, nombre, categoriaId, precioMin, precioMax, stockMin);</span>
+    }
+
+    @GetMapping(&quot;/{id}&quot;)
+    public EntidadResponse obtener(@PathVariable Long id) {
+<span class="nc" id="L46">        return entidadService.obtenerPorId(id);</span>
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public EntidadResponse crear(@Valid @RequestBody EntidadRequest request) {
+<span class="nc" id="L52">        return entidadService.crear(request);</span>
+    }
+
+    @PutMapping(&quot;/{id}&quot;)
+    public EntidadResponse actualizar(@PathVariable Long id, @Valid @RequestBody EntidadRequest request) {
+<span class="nc" id="L57">        return entidadService.actualizar(id, request);</span>
+    }
+
+    @DeleteMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Void&gt; eliminar(@PathVariable Long id) {
+<span class="nc" id="L62">        entidadService.eliminar(id);</span>
+<span class="nc" id="L63">        return ResponseEntity.noContent().build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

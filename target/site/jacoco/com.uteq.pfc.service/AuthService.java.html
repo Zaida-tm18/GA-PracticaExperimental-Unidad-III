@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pfc-backend</a> &gt; <a href="index.source.html" class="el_package">com.uteq.pfc.service</a> &gt; <span class="el_source">AuthService.java</span></div><h1>AuthService.java</h1><pre class="source lang-java linenums">package com.uteq.pfc.service;
+
+import com.uteq.pfc.dto.AuthDtos;
+import com.uteq.pfc.entity.Usuario;
+import com.uteq.pfc.exception.RecursoNoEncontradoException;
+import com.uteq.pfc.repository.UsuarioRepository;
+import com.uteq.pfc.security.JwtProvider;
+import com.uteq.pfc.security.TokenBlacklistService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.time.Duration;
+
+@Service
+@RequiredArgsConstructor
+public class AuthService {
+
+    private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtProvider jwtProvider;
+    private final TokenBlacklistService blacklistService;
+
+<span class="nc" id="L24">    public record LoginResultado(String token, String nombre, String rol) {}</span>
+
+    public LoginResultado login(String email, String passwordPlano) {
+<span class="nc" id="L27">        Usuario usuario = usuarioRepository.findByEmail(email)</span>
+<span class="nc" id="L28">                .orElseThrow(() -&gt; new RecursoNoEncontradoException(&quot;Credenciales invalidas&quot;));</span>
+
+<span class="nc bnc" id="L30" title="All 2 branches missed.">        if (!passwordEncoder.matches(passwordPlano, usuario.getPasswordHash())) {</span>
+<span class="nc" id="L31">            throw new RecursoNoEncontradoException(&quot;Credenciales invalidas&quot;);</span>
+        }
+
+<span class="nc" id="L34">        String token = jwtProvider.generarToken(usuario.getEmail(), usuario.getRol());</span>
+<span class="nc" id="L35">        return new LoginResultado(token, usuario.getNombre(), usuario.getRol());</span>
+    }
+
+    /**
+     * Logout real: extrae el JTI del token vigente y lo agrega a la
+     * blacklist de Redis con TTL = tiempo restante del token. Desde ese
+     * momento, JwtAuthFilter rechazara ese JTI aunque la firma siga siendo
+     * valida -&gt; esto es lo que se debe demostrar en el Paso 3 (evidencia:
+     * llamar a un endpoint protegido con el mismo token despues del logout
+     * y confirmar que responde 401/403).
+     */
+    public AuthDtos.LogoutResponse logout(String token) {
+<span class="nc" id="L47">        String jti = jwtProvider.extraerJti(token);</span>
+<span class="nc" id="L48">        Duration restante = jwtProvider.tiempoRestante(token);</span>
+<span class="nc" id="L49">        blacklistService.invalidar(jti, restante);</span>
+<span class="nc" id="L50">        return new AuthDtos.LogoutResponse(&quot;Sesion cerrada correctamente. Token invalidado.&quot;, jti);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
