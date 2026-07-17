@@ -12,11 +12,11 @@ INSERT INTO categorias (nombre, descripcion) VALUES ('Libros', 'Libros y materia
 INSERT INTO categorias (nombre, descripcion) VALUES ('Ropa', 'Vestimenta y accesorios');
 
 -- Usuarios (password_hash = BCrypt de 'Password123!' generado en la app; aqui placeholder)
-INSERT INTO usuarios (nombre, email, password_hash, rol) VALUES ('Ana Torres', 'ana.torres@uteq.edu.ec', '$2a$10$PLACEHOLDER_BCRYPT_HASH_REEMPLAZAR', 'ADMIN');
-INSERT INTO usuarios (nombre, email, password_hash, rol) VALUES ('Luis Zambrano', 'luis.zambrano@uteq.edu.ec', '$2a$10$PLACEHOLDER_BCRYPT_HASH_REEMPLAZAR', 'USUARIO');
-INSERT INTO usuarios (nombre, email, password_hash, rol) VALUES ('Maria Cedeno', 'maria.cedeno@uteq.edu.ec', '$2a$10$PLACEHOLDER_BCRYPT_HASH_REEMPLAZAR', 'USUARIO');
-INSERT INTO usuarios (nombre, email, password_hash, rol) VALUES ('Carlos Mero', 'carlos.mero@uteq.edu.ec', '$2a$10$PLACEHOLDER_BCRYPT_HASH_REEMPLAZAR', 'USUARIO');
-INSERT INTO usuarios (nombre, email, password_hash, rol) VALUES ('Jessica Ponce', 'jessica.ponce@uteq.edu.ec', '$2a$10$PLACEHOLDER_BCRYPT_HASH_REEMPLAZAR', 'ADMIN');
+INSERT INTO usuarios (nombre, email, password_hash, rol) VALUES ('Ana Torres', 'ana.torres@uteq.edu.ec', '$2b$10$9aT1m.6Pl35sESecaVN2Vun3aLPYub/v.iDYT8P4lbyBiKgTHNJMi', 'ADMIN');
+INSERT INTO usuarios (nombre, email, password_hash, rol) VALUES ('Luis Zambrano', 'luis.zambrano@uteq.edu.ec', '$2b$10$9aT1m.6Pl35sESecaVN2Vun3aLPYub/v.iDYT8P4lbyBiKgTHNJMi', 'USUARIO');
+INSERT INTO usuarios (nombre, email, password_hash, rol) VALUES ('Maria Cedeno', 'maria.cedeno@uteq.edu.ec', '$2b$10$9aT1m.6Pl35sESecaVN2Vun3aLPYub/v.iDYT8P4lbyBiKgTHNJMi', 'USUARIO');
+INSERT INTO usuarios (nombre, email, password_hash, rol) VALUES ('Carlos Mero', 'carlos.mero@uteq.edu.ec', '$2b$10$9aT1m.6Pl35sESecaVN2Vun3aLPYub/v.iDYT8P4lbyBiKgTHNJMi', 'USUARIO');
+INSERT INTO usuarios (nombre, email, password_hash, rol) VALUES ('Jessica Ponce', 'jessica.ponce@uteq.edu.ec', '$2b$10$9aT1m.6Pl35sESecaVN2Vun3aLPYub/v.iDYT8P4lbyBiKgTHNJMi', 'ADMIN');
 
 -- Entidades (55 registros >= 50 requeridos)
 INSERT INTO entidades (nombre, descripcion, precio, stock, categoria_id, usuario_id) VALUES ('Laptop', 'Descripcion detallada de laptop, articulo numero 1 del catalogo de prueba.', 577.28, 6, 2, 2);

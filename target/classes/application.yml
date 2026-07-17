@@ -6,7 +6,7 @@ spring:
     name: pfc-backend
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/pfc_db
+    url: jdbc:postgresql://localhost:5433/pfc_db
     username: pfc_user
     password: pfc_password
     driver-class-name: org.postgresql.Driver
