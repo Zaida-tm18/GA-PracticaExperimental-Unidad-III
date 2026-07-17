@@ -28,14 +28,22 @@ Descompone el contenedor de mayor complejidad (API Application) en sus component
 - **Relaciones clave:** el filtro JWT verifica la blacklist de JTI en Redis antes de permitir el paso a los controllers; ResourceService aplica `@Cacheable`/`@CacheEvict` sobre Redis antes de llegar al Repository/PostgreSQL.
 
 ## Diagrama de clases UML
-**Archivo:** `Diagrama-UML-Clases.png` *(pendiente)*
+**Archivo:** `Diagrama-UML-Clases.png`
 
-Diagrama de clases refactorizado con todos los paquetes del sistema implementado hasta la entrega actual (exportado desde IntelliJ IDEA Diagrams o PlantUML).
+Refleja el paquete `entity` implementado hasta esta entrega (`Usuario`, `Categoria`, `Entidad`), con atributos, tipos y asociaciones según las anotaciones JPA reales del código.
+
+- **Asociaciones:** `Entidad(0..*) → Categoria(1)` (FK `categoria_id` obligatoria); `Entidad(0..*) → Usuario(0..1)` (FK `usuario_id` opcional).
+- **Nota:** la tabla `auditoria_tokens` existe en la base de datos pero aún no tiene clase JPA correspondiente; se actualizará este diagrama si se agrega.
+
 
 ## Diagrama Entidad-Relación
-**Archivo:** `Diagrama-ER.png` *(pendiente)*
+**Archivo:** `Diagrama-ER.png`
 
-Generado desde pgAdmin 4 ERD Tool, muestra las tablas de la base de datos PostgreSQL y sus relaciones.
+Generado desde pgAdmin 4 ERD Tool, muestra las 4 tablas de la base de datos PostgreSQL y sus relaciones.
+
+- **Tablas:** `usuarios`, `categorias`, `entidades`, `auditoria_tokens`.
+- **Relaciones:** `entidades.categoria_id` → `categorias.id` (obligatoria); `entidades.usuario_id` → `usuarios.id` (opcional); `auditoria_tokens.usuario_id` → `usuarios.id` (obligatoria).
+
 
 ---
 *Última actualización: 13 de julio de 2026 — C4 Nivel 1, 2 y 3 completados.*
