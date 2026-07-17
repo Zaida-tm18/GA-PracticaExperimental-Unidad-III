@@ -14,9 +14,12 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 
 /**
- * Capa Controller (arquitectura en capas). Corresponde al endpoint
- * /api/entidades mencionado en el Paso 5.1 de la guia (integracion
- * frontend-backend-datos).
+ * Servicio veterinario del PFC &quot;MarketPlace UTEQ&quot; — plataforma de comercio electrónico 
+ * multicategoría para la gestión de catálogo de productos, con backend Spring Boot.
+ * Se mantiene el nombre técnico &quot;Entidad&quot;/&quot;entidades&quot; en clase, tabla y
+ * endpoint por consistencia con la nomenclatura definida catálogo de servicios veterinarios;
+ * el dominio real que representa es el catálogo de
+ * servicios/productos de la veterinaria.
  */
 @RestController
 @RequestMapping(&quot;/api/entidades&quot;)
@@ -38,29 +41,29 @@ public class EntidadController {
             @RequestParam(required = false) BigDecimal precioMin,
             @RequestParam(required = false) BigDecimal precioMax,
             @RequestParam(required = false) Integer stockMin) {
-<span class="nc" id="L41">        return entidadService.listar(pageable, nombre, categoriaId, precioMin, precioMax, stockMin);</span>
+<span class="nc" id="L44">        return entidadService.listar(pageable, nombre, categoriaId, precioMin, precioMax, stockMin);</span>
     }
 
     @GetMapping(&quot;/{id}&quot;)
     public EntidadResponse obtener(@PathVariable Long id) {
-<span class="nc" id="L46">        return entidadService.obtenerPorId(id);</span>
+<span class="nc" id="L49">        return entidadService.obtenerPorId(id);</span>
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public EntidadResponse crear(@Valid @RequestBody EntidadRequest request) {
-<span class="nc" id="L52">        return entidadService.crear(request);</span>
+<span class="nc" id="L55">        return entidadService.crear(request);</span>
     }
 
     @PutMapping(&quot;/{id}&quot;)
     public EntidadResponse actualizar(@PathVariable Long id, @Valid @RequestBody EntidadRequest request) {
-<span class="nc" id="L57">        return entidadService.actualizar(id, request);</span>
+<span class="nc" id="L60">        return entidadService.actualizar(id, request);</span>
     }
 
     @DeleteMapping(&quot;/{id}&quot;)
     public ResponseEntity&lt;Void&gt; eliminar(@PathVariable Long id) {
-<span class="nc" id="L62">        entidadService.eliminar(id);</span>
-<span class="nc" id="L63">        return ResponseEntity.noContent().build();</span>
+<span class="nc" id="L65">        entidadService.eliminar(id);</span>
+<span class="nc" id="L66">        return ResponseEntity.noContent().build();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

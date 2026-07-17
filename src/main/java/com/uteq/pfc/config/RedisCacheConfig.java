@@ -1,7 +1,9 @@
 package com.uteq.pfc.config;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -22,6 +24,12 @@ import java.time.Duration;
  *  - Blacklist de JTI para JWT - GA punto 2a
  *
  * Justificacion de Redis vs alternativas: ver ADR-003 del equipo (Panama).
+ *
+ * IMPORTANTE: activateDefaultTyping es necesario para que
+ * GenericJackson2JsonRedisSerializer incluya el nombre de la clase (@class)
+ * en el JSON guardado en Redis. Sin esto, al deserializar en un cache-hit
+ * Jackson devuelve un LinkedHashMap generico en vez del tipo real
+ * (p.ej. PageResponse), causando ClassCastException en el Service.
  */
 @Configuration
 @EnableCaching
@@ -32,6 +40,13 @@ public class RedisCacheConfig {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        BasicPolymorphicTypeValidator ptv = BasicPolymorphicTypeValidator.builder()
+                .allowIfSubType("com.uteq.pfc.")
+                .allowIfSubType("java.util.")
+                .build();
+        mapper.activateDefaultTyping(ptv, ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
+
         return mapper;
     }
 
@@ -69,3 +84,4 @@ public class RedisCacheConfig {
                 .build();
     }
 }
+

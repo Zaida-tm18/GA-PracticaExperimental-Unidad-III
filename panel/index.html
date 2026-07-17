@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Panel de pruebas - PFC Backend</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; }
+  h1 { font-size: 1.4rem; }
+  section { border: 1px solid #ccc; border-radius: 8px; padding: 16px; margin-bottom: 20px; }
+  button { padding: 8px 16px; margin-right: 8px; cursor: pointer; }
+  input { padding: 6px; margin-right: 8px; }
+  pre { background: #f4f4f4; padding: 12px; border-radius: 6px; overflow-x: auto; white-space: pre-wrap; }
+  .ok { color: green; }
+  .err { color: red; }
+</style>
+</head>
+<body>
+
+<h1>Panel de pruebas — PFC Backend (UTEQ)</h1>
+<p>Sirve esta página en <code>http://localhost:5500</code> (origen permitido por CORS) y abre las DevTools (F12) para las capturas.</p>
+
+<section>
+  <h2>1. Login</h2>
+  <input id="email" value="ana.torres@uteq.edu.ec" size="30">
+  <input id="password" value="Password123!" type="text" size="20">
+  <button onclick="login()">Iniciar sesión</button>
+  <pre id="loginResult">—</pre>
+</section>
+
+<section>
+  <h2>2. Listar entidades (paginado)</h2>
+  <button onclick="listar()">GET /api/entidades?page=0&size=10</button>
+  <pre id="listarResult">—</pre>
+</section>
+
+<section>
+  <h2>3. Logout</h2>
+  <button onclick="logout()">Cerrar sesión</button>
+  <pre id="logoutResult">—</pre>
+</section>
+
+<section>
+  <h2>4. Confirmar que el token ya no sirve</h2>
+  <button onclick="listar('confirmResult')">GET /api/entidades (debe dar 401/403)</button>
+  <pre id="confirmResult">—</pre>
+</section>
+
+<script>
+const BASE = "http://localhost:8080";
+
+async function login() {
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const out = document.getElementById('loginResult');
+  try {
+    const res = await fetch(`${BASE}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    out.textContent = `Status: ${res.status}\n` + JSON.stringify(data, null, 2);
+    out.className = res.ok ? 'ok' : 'err';
+  } catch (e) {
+    out.textContent = 'Error: ' + e.message;
+    out.className = 'err';
+  }
+}
+
+async function listar(targetId = 'listarResult') {
+  const out = document.getElementById(targetId);
+  try {
+    const res = await fetch(`${BASE}/api/entidades?page=0&size=10`, {
+      method: 'GET',
+      credentials: 'include'
+    });
+    const data = await res.json().catch(() => ({}));
+    out.textContent = `Status: ${res.status}\n` + JSON.stringify(data, null, 2);
+    out.className = res.ok ? 'ok' : 'err';
+  } catch (e) {
+    out.textContent = 'Error: ' + e.message;
+    out.className = 'err';
+  }
+}
+
+async function logout() {
+  const out = document.getElementById('logoutResult');
+  try {
+    const res = await fetch(`${BASE}/api/auth/logout`, {
+      method: 'POST',
+      credentials: 'include'
+    });
+    const data = await res.json();
+    out.textContent = `Status: ${res.status}\n` + JSON.stringify(data, null, 2);
+    out.className = res.ok ? 'ok' : 'err';
+  } catch (e) {
+    out.textContent = 'Error: ' + e.message;
+    out.className = 'err';
+  }
+}
+</script>
+
+</body>
+</html>
